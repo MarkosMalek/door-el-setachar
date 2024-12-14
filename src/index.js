@@ -1,18 +1,23 @@
 const express = require("express");
-const mangoose = require("mongoose");
 const dotenv= require("dotenv");
+const { connectDB } = require("./db/connect");
+dotenv.config({path:"../.env"});
 
-dotenv.config();
+
 const app = express();
+app.use("/",require("./routes/main"));
+
+
+
+
 const PORT=process.env.PORT || 3000
 
-//connect to the database
-mangoose.connect(process.env.MONGODB_URL);
 
-
-app.use("/",require("./routes/main"))
-
-
-app.listen(PORT,()=>{
-    console.log(`we are live at ${PORT}`)
-})
+connectDB()
+    //if only we are connected to the database containue with lounching the server
+    .then(()=>{
+        app.listen(PORT,()=>{
+            console.log(`we are live at ${PORT}`)
+        })
+    })
+    .catch(error=>console.log(error))
