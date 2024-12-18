@@ -8,12 +8,16 @@ const { connectDB } = require("./db/connect");
 const app = express();
 
 //commen middleware
-app.use("/",require("./routes/main"));
 app.use(express.json({limit:"16kb"}))
 app.use(cors({
     origin:process.env.CORS_ORIGIN,
     credentials:true
 }));
+
+
+//routes
+app.use("/",require("./routes/main"));
+app.use("/users",require("./routes/users.route"))
 
 
 const PORT=process.env.PORT || 4000
