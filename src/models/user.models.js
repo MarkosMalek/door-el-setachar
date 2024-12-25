@@ -9,11 +9,18 @@ const User_Scheme = new Schema({
     },
     email:{
         "type":String,
-        "required":true
+        "required":true,
+        "unique":true
     },
     password:{
         "type":String,
         "required":true
+    },
+    refreshtoken:{
+        "type":String
+    },
+    isLoggedIn:{
+        "type":Boolean
     }
 });
 
@@ -32,23 +39,23 @@ User_Scheme.methods.isPasswordCorrect = async function (password) {
 //create JWT access Token 
 User_Scheme.methods.createAccessToken = function(){
     //short lived Access Token
-    jwt.sign({
+    return jwt.sign({
         _id:this._id
     },process.env.ACCESS_TOKEN_SECRET
-    ,{expiresIn:'1d'})
+    ,{expiresIn:'5s'})
 }
 
-//create JWT access Token
+//create JWT Refresh Token
 User_Scheme.methods.createRefreshToken = function(){
     //Long lived Refresh Token
-    jwt.sign({
+    return jwt.sign({
         _id:this._id
     },process.env.REFRESH_TOKEN_SECRET
     ,{expiresIn:'10d'})
 }
 
 
-const user =  mongoose.model('User',User_Scheme)
-module.exports =user;
+const User =  mongoose.model('User',User_Scheme)
+module.exports =User;
 
 

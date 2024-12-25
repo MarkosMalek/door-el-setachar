@@ -1,7 +1,20 @@
 const asyncHandler = require("express-async-handler");
-const user=require("../models/user.models.js")
+const User=require("../models/user.models.js")
 const bcrypt =require("bcrypt");
 
+
+// JWT access and refresh tokens
+const genrateAccessAndRefreshTokens =async(userID)=>{
+    try {
+        const user = await User.findById(userID);
+        const accessToken = user.createAccessToken()
+        const refreshToken = user.createRefreshToken()
+        return {accessToken,refreshToken}
+    } catch (error) {
+        console.log(error);
+        console.log("something went wrong with creating access and refresh tokens")
+    }
+}
 
 //register a new user
 const registerUser = asyncHandler(async (req,res)=>{
@@ -11,16 +24,30 @@ const registerUser = asyncHandler(async (req,res)=>{
     if(!name || !email || !password){
         res.send("please enter all fields");
     }
-    const existingUser = await user.findOne({$or:[{name:name},{email:email}]})
+    const existingUser = await User.findOne({$or:[{name:name},{email:email}]})
         if(existingUser==null){
-            const newUser = await user.create({name,email,password});
-            res.send(newUser)
-        }else  res.send("user already exist")
-    
-    // JWT access and refresh tokens
+            //create a new user in the database
+            const newUser = await User.create({name,email,password});
+            
+            //Get createdUser from DataBase
+            const createdUser=await User.findOne({email:email})
+            //create access and refresh tokens
+            const {accessToken,refreshToken} = await genrateAccessAndRefreshTokens(createdUser._id)
+            
+            //save the new generated refresh token to the database aslo toggle the islogged in to true
+            createdUser.refreshtoken=refreshToken;
+            createdUser.isLoggedIn =true;
+            await createdUser.save();
 
-    
-    
+            //save the same refersh token to the cookies
+            res.cookie('refreshToken',refreshToken,{
+                httpOnly:true,
+                secure:true,
+                sameSite:'strict'
+            })
+
+            res.send(accessToken)
+        }else  res.send("user with same email or name already exist")    
 })
 
 //log in
@@ -29,7 +56,7 @@ const logIn = asyncHandler(async (req,res)=>{
         if(!name || !email || !password){
             res.send("please enter all fields");
         }
-        const existingUser = await user.findOne({name:name,email:email})
+        const existingUser = await User.findOne({name:name,email:email})
         if(existingUser==null){
             res.send("no user with this name or email,please register as a new user first")
         }else{
@@ -48,7 +75,7 @@ const logIn = asyncHandler(async (req,res)=>{
 //get all users
 
 const userController = asyncHandler(async (req,res)=>{
-    const allUsers = await user.find({})
+    const allUsers = await User.find({})
     res.send(allUsers)
 
 });
