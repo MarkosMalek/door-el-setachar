@@ -8,7 +8,7 @@ const { userController,
 
 
 //home page
-router.get("/All",userController);
+router.get("/all",userController);
 
 //register a new user 
 

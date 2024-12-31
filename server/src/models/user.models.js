@@ -10,7 +10,8 @@ const User_Scheme = new Schema({
     email:{
         "type":String,
         "required":true,
-        "unique":true
+        "unique":true,
+        "lowercase":true
     },
     password:{
         "type":String,
@@ -18,9 +19,6 @@ const User_Scheme = new Schema({
     },
     refreshtoken:{
         "type":String
-    },
-    isLoggedIn:{
-        "type":Boolean
     }
 });
 
@@ -31,7 +29,7 @@ User_Scheme.pre("save", async function(next) {
     next();
    });
 
-// create a methode that check if password correct
+//check if password correct
 User_Scheme.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password,this.password)
 }

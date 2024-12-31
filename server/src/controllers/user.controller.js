@@ -1,17 +1,16 @@
 const asyncHandler = require("express-async-handler");
 const User=require("../models/user.models.js")
-const bcrypt =require("bcrypt");
 
 
 // JWT access and refresh tokens
 const genrateAccessAndRefreshTokens =async(userID)=>{
     try {
-        const user = await User.findById(userID);
+        const user = await User.findById(userID)
         const accessToken = user.createAccessToken()
         const refreshToken = user.createRefreshToken()
         return {accessToken,refreshToken}
     } catch (error) {
-        console.log(error);
+        console.log(error)
         console.log("something went wrong with creating access and refresh tokens")
     }
 }
@@ -22,23 +21,18 @@ const registerUser = asyncHandler(async (req,res)=>{
 
     //some validation
     if(!name || !email || !password){
-        res.send("please enter all fields");
+        res.send("please enter all fields")
     }
     const existingUser = await User.findOne({$or:[{name:name},{email:email}]})
         if(existingUser==null){
             //create a new user in the database
-            const newUser = await User.create({name,email,password});
-            
-            //Get createdUser from DataBase
-            const createdUser=await User.findOne({email:email})
-            //create access and refresh tokens
-            const {accessToken,refreshToken} = await genrateAccessAndRefreshTokens(createdUser._id)
-            
-            //save the new generated refresh token to the database aslo toggle the islogged in to true
-            createdUser.refreshtoken=refreshToken;
-            createdUser.isLoggedIn =true;
-            await createdUser.save();
+            const newUser = await User.create({name,email,password})
 
+            //create access and refresh tokens
+            const {accessToken,refreshToken} = await genrateAccessAndRefreshTokens(newUser._id)
+            //save the new generated refresh token to the database
+            newUser.refreshtoken=refreshToken
+            await newUser.save()
             //save the same refersh token to the cookies
             res.cookie('refreshToken',refreshToken,{
                 httpOnly:true,
@@ -54,39 +48,35 @@ const registerUser = asyncHandler(async (req,res)=>{
 const logIn = asyncHandler(async (req,res)=>{
         const {name,email,password}=req.body
         if(!name || !email || !password){
-            res.send("please enter all fields");
+            res.send("please enter all fields")
         }
-        const existingUser = await User.findOne({name:name,email:email})
+        const existingUser = await User.findOne({name,email})
         if(existingUser==null){
-            res.send("no user with this name or email,please register as a new user first")
+            res.send("no user with this name or email,if you are new please register as a new user first")
         }else{
-            const isPasswordCorrect = await bcrypt.compare(password,existingUser.password);
-            if(isPasswordCorrect){
+            const isCorrect = await existingUser.isPasswordCorrect(password)
+            if(isCorrect){
                 res.send(`password is correct wellcome : ${name}`)
+
             }else res.send("password is incorrect")
         }
         
 
 
 })
-//log out
-
 
 //get all users
-
 const userController = asyncHandler(async (req,res)=>{
     const allUsers = await User.find({})
     res.send(allUsers)
 
 });
-
-
-//get a single user
-
-
+//log out
 //delete a user
-
 //update a user
 
-
-module.exports= {userController,registerUser,logIn}
+module.exports= {
+    userController,
+    registerUser,
+    logIn
+}
