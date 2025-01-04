@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const scheme = mongoose.Schema;
 
@@ -18,9 +20,6 @@ const User_Scheme = new scheme({
   },
   refreshtoken: {
     type: String,
-  },
-  isLoggedIn: {
-    type: Boolean,
   },
 });
 
