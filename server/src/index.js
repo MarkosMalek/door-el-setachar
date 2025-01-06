@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { connectDB } = require("./db/connect");
+const authMiddleware = require("./middlewares/auth.middleware");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "../.env" });
@@ -19,7 +20,7 @@ app.use(
 app.use(cookieParser());
 
 //routes
-app.use("/", require("./routes/main.routes"));
+app.use("/home", authMiddleware, require("./routes/main.routes"));
 app.use("/auth", require("./routes/auth.routes"));
 app.use("/users", require("./routes/user.routes"));
 
