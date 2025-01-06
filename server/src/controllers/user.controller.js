@@ -3,7 +3,7 @@ const User = require("../models/user.models.js");
 const genrateAccessAndRefreshTokens = require("../utils/generateTokens.js");
 
 //Create a new user
-const registerUser = asyncHandler(async (req, res) => {
+const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
   //some validation
@@ -36,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 //get all users
-const userController = asyncHandler(async (req, res) => {
+const all = asyncHandler(async (req, res) => {
   const allUsers = await User.find({});
   res.send(allUsers);
 });
@@ -46,6 +46,6 @@ const userController = asyncHandler(async (req, res) => {
 //delete a user
 
 module.exports = {
-  userController,
-  registerUser,
+  register,
+  all,
 };

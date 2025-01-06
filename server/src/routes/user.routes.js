@@ -1,17 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  userController,
-  registerUser,
-} = require("../controllers/user.controller.js");
+const userController = require("../controllers/user.controller.js");
 
 //create a new user
 
-router.post("/register", registerUser);
+router.post("/register", userController.register);
 
 //get all users
-router.get("/all", userController);
+router.get("/all", userController.all);
 
 //get a specific user
 //update a user

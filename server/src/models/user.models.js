@@ -43,7 +43,7 @@ User_Scheme.methods.createAccessToken = function () {
       _id: this._id,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "5s" }
+    { expiresIn: "1m" }
   );
 };
 

@@ -8,7 +8,7 @@ const varifyToken = require("../utils/varifyToken");
 //@DESC Login
 //Route POST /auth/login
 //Access Public
-const logInController = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
     return res.status(400).json({ message: "all fields are required!" });
@@ -44,9 +44,9 @@ const logInController = asyncHandler(async (req, res) => {
 //@DESC Logout
 //Route POST /auth/logout
 //Access Public - remove token from cookies
-const logOutController = asyncHandler((req, res) => {
+const logout = asyncHandler((req, res) => {
   const cookie = req.cookies;
-  if (!cookie.refreshToken) return res.status(204).send("no content");
+  if (!cookie?.refreshToken) return res.sendStatus(204); //sending a respond with no content
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: true,
@@ -57,21 +57,22 @@ const logOutController = asyncHandler((req, res) => {
 
 //@DESC refresh
 //Route GET /auth/refresh
-//Access Public -create a new access token when access token expired
-const refreshController = asyncHandler(async (req, res) => {
+//Access Public -create a new access token when access token expired only if refresh token is in the cookies and is valid
+const refresh = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
   if (!cookies.refreshToken)
     return res.status(401).json({ message: "Unauthorized" });
   const refreshToken = cookies.refreshToken;
-  const decodedToken = await varifyToken(
+  const decodedRefreshToken = await varifyToken(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET
   ); //return decoded or null
-  if (!decodedToken) return res.status(401).json({ message: "Unauthorized" });
-  const user = await User.findById(decodedToken._id);
+  if (!decodedRefreshToken)
+    return res.status(401).json({ message: "Unauthorized" });
+  const user = await User.findById(decodedRefreshToken._id);
   if (!user) return res.status(401).json({ message: "Unauthorized" });
   const { accessToken } = await genrateAccessAndRefreshTokens(user._id);
   res.json({ accessToken });
 });
 
-module.exports = { logInController, logOutController, refreshController };
+module.exports = { login, logout, refresh };
