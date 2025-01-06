@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { logInController } = require("../controllers/auth.controller");
-
-// log-in
-// http://localhost:5000/auth/login
+const {
+  logInController,
+  logOutController,
+  refreshController,
+} = require("../controllers/auth.controller");
 
 router.post("/login", logInController);
+router.get("/refresh", refreshController);
+router.post("/logout", logOutController);
 
 module.exports = router;
