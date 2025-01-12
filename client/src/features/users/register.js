@@ -2,6 +2,15 @@ import React from "react";
 import { Form, Button } from "react-bootstrap";
 import "../../forms.css";
 
+/**
+ * Renders a registration form component with input fields for name, email, and password.
+ * 
+ * @returns {JSX.Element} A centered form with input fields and a submit button.
+ * @component
+ * @example
+ * // Renders a full-screen registration form
+ * <register />
+ */
 function register() {
   return (
     <div class="container min-vh-100 d-flex justify-content-center align-items-center">
