@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./features/home";
-import Register from "./features/register";
+import Register from "./features/users/register";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
