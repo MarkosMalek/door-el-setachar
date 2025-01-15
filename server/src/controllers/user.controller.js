@@ -31,14 +31,14 @@ const register = asyncHandler(async (req, res) => {
       sameSite: "strict",
     });
 
-    res.send(accessToken);
-  } else res.send("user with same email or name already exist");
+    res.json(accessToken);
+  } else res.status(409).json("user with same email or name already exist");
 });
 
 //get all users
 const all = asyncHandler(async (req, res) => {
   const allUsers = await User.find({});
-  res.send(allUsers);
+  res.json(allUsers);
 });
 
 //get a specific user
